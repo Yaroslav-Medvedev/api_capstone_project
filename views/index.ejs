@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Potential</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<div class="site-brand">
+    <span class="brand-icon" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </span>
+    City Potential
+</div>
+<body>
+    <% if (error) { %>
+        <p><%= error %></p>
+    <% } else { %>
+        <header class="page-header">
+            <h1>Find high-potential cities for rental properties</h1>
+            <p>Compare income growth and housing affordability across U.S. cities</p>
+        </header>
+        <p class="score-description">
+            Scores equally weight 10-year income growth and housing affordability, relative to eligible cities.
+            <br>Data: U.S. Census Bureau ACS one-year estimates via the Data USA API.
+        </p>
+        <form action="/" method="GET" class="filters">
+            <div class="filter-field search-field">
+                <label for="search">Search cities</label>
+                <input
+                    type="search"
+                    id="search"
+                    name="search"
+                    placeholder="Enter a city name"
+                    value="<%= search %>"
+                >
+            </div>
+            <div class="filter-field dropdown-field">
+                <label for="state">State</label>
+                <select id="state" name="state">
+                    <option value="">All states</option>
+                    <% states.forEach(state => { %>
+                        <option
+                            value="<%= state %>"
+                            <%= state === selectedState ? "selected" : "" %>
+                        >
+                            <%= state %>
+                        </option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="filter-field dropdown-field">
+                <label for="sort">Sort by</label>
+                <select id="sort" name="sort">
+                    <option value="score" <%= sort === "score" ? "selected" : ""%>>Score: highest first</option>
+                    <option value="scoreLow" <%= sort === "scoreLow" ? "selected" : ""%>>Score: lowest first</option>
+                    <option value="income" <%= sort === "income" ? "selected" : ""%>>Household income: highest first</option>
+                    <option value="incomeLow" <%= sort === "incomeLow" ? "selected" : ""%>>Household income: lowest first</option>
+                    <option value="growth" <%= sort === "growth" ? "selected" : ""%>>Income growth: highest first</option>
+                    <option value="growthLow" <%= sort === "growthLow" ? "selected" : ""%>>Income growth: lowest first</option>
+                    <option value="homeValue" <%= sort === "homeValue" ? "selected" : ""%>>Home value: lowest first</option>
+                    <option value="homeValueHigh" <%= sort === "homeValueHigh" ? "selected" : ""%>>Home value: highest first</option>
+                    <option value="affordability" <%= sort === "affordability" ? "selected" : ""%>>Value-to-income: lowest first</option>
+                    <option value="affordabilityHigh" <%= sort === "affordabilityHigh" ? "selected" : ""%>>Value-to-income: highest first</option>
+                </select>
+            </div>
+            <button type="submit">Search</button>
+            <a href="/" class="clear-filters">Clear filters</a>
+        </form>
+        <% if (cities.length === 0) { %>
+            <p>No cities match your filters.</p>
+        <% } else { %>
+            <p>Showing <%= cities.length %> cities</p>
+        <% } %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Household income (2024)</th>
+                    <th>Income growth (2014-2024)</th>
+                    <th>Home value (2024)</th>
+                    <th>Value-to-income</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% cities.forEach((city, index) => { %>
+                    <tr>
+                        <td><%= city.rank %></td>
+                        <td><%= city.displayName %></td>
+                        <td><%= city.state %></td>
+                        <td>$<%= city.income2024.toLocaleString("en-US") %></td>
+                        <td><%= city.incomeGrowth.toFixed(1) %>%</td>
+                        <td>$<%= city.homeValue2024.toLocaleString("en-US") %></td>
+                        <td><%= city.valueToIncome.toFixed(2) %></td>
+                        <td>
+                            <span class="score-badge"><%= city.score.toFixed(1) %></span>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+       </table>
+    <% } %>
+    </body>
+</html>
